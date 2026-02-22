@@ -2,26 +2,26 @@ import React, { useRef, useEffect, useState, useCallback } from "react";
 import "./App.css";
 
 const backgroundThemes = [
-  { key: "blue", label: "💙 Ocean", accent: "#2f9dd2" },
-  { key: "yellow", label: "💛 Butter", accent: "#efb40d" },
-  { key: "pinkgreen", label: "🌸 Mint", accent: "#f48fb1" },
-  { key: "purple", label: "💜 Grape", accent: "#8d4ad5" },
-  { key: "black", label: "🖤 Mono", accent: "#3b3b3b" }
+  { key: "yellow", label: "💛 Honey Cream" },
+  { key: "pinkgreen", label: "🌸 Mint Blossom" },
+  { key: "purple", label: "💜 Lavender Dream" },
+  { key: "black", label: "🖤 Monochrome Chic" },
+  { key: "blue", label: "💙 Blueberry Soda" }
 ];
 
 const filters = [
   { value: "none", label: "✨ Natural" },
-  { value: "grayscale(100%)", label: "🖤 Mono" },
-  { value: "sepia(100%)", label: "📜 Sepia" },
-  { value: "brightness(120%)", label: "☀️ Bright" },
-  { value: "contrast(150%)", label: "⚡ Contrast" }
+  { value: "grayscale(100%)", label: "🖤 Vintage Mono" },
+  { value: "sepia(100%)", label: "📜 Warm Sepia" },
+  { value: "brightness(120%)", label: "☀️ Glow Up" },
+  { value: "contrast(150%)", label: "⚡ Pop Contrast" }
 ];
 
 export default function App() {
   const videoRef = useRef();
   const [photos, setPhotos] = useState([]);
   const [frameCount, setFrameCount] = useState(2);
-  const [stripBackground, setStripBackground] = useState("blue");
+  const [stripBackground, setStripBackground] = useState("pinkgreen");
   const [filter, setFilter] = useState("none");
   const [currentFrame, setCurrentFrame] = useState(0);
   const [countdown, setCountdown] = useState(null);
@@ -64,13 +64,18 @@ export default function App() {
       const mimeString = p.photo.split(",")[0].split(":")[1].split(";")[0];
       const ab = new ArrayBuffer(byteString.length);
       const ia = new Uint8Array(ab);
-      for (let j = 0; j < byteString.length; j++) ia[j] = byteString.charCodeAt(j);
+      for (let j = 0; j < byteString.length; j++) {
+        ia[j] = byteString.charCodeAt(j);
+      }
       const blob = new Blob([ab], { type: mimeString });
       formData.append("files", blob, `photo${i}.png`);
     });
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/finalize_strip/", { method: "POST", body: formData });
+      const response = await fetch("http://127.0.0.1:8000/finalize_strip/", {
+        method: "POST",
+        body: formData
+      });
       const data = await response.json();
       setStripUrl(data.strip_url);
       setStripQrUrl(data.strip_qr_url);
@@ -86,16 +91,12 @@ export default function App() {
     }
   }, [currentFrame, photos, frameCount, finalizeStrip]);
 
-  const takePhoto = () => {
-    if (!videoRef.current) return;
-    const canvas = document.createElement("canvas");
-    canvas.width = videoRef.current.videoWidth;
-    canvas.height = videoRef.current.videoHeight;
-    const ctx = canvas.getContext("2d");
-    if (filter !== "none") ctx.filter = filter;
-    ctx.drawImage(videoRef.current, 0, 0);
-    shutter.play();
-    setPhotos((prev) => [...prev, { photo: canvas.toDataURL("image/png") }]);
+  const startCaptureSequence = () => {
+    setPhotos([]);
+    setCurrentFrame(0);
+    setStripUrl("");
+    setStripQrUrl("");
+    runSequence(0);
   };
 
   const runSequence = (frameIndex) => {
@@ -115,12 +116,21 @@ export default function App() {
     }, 1000);
   };
 
-  const startCaptureSequence = () => {
-    setPhotos([]);
-    setCurrentFrame(0);
-    setStripUrl("");
-    setStripQrUrl("");
-    runSequence(0);
+  const takePhoto = () => {
+    if (!videoRef.current) return;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+    const ctx = canvas.getContext("2d");
+
+    if (filter !== "none") ctx.filter = filter;
+
+    ctx.drawImage(videoRef.current, 0, 0);
+    const imgData = canvas.toDataURL("image/png");
+
+    shutter.play();
+    setPhotos((prev) => [...prev, { photo: imgData }]);
   };
 
   const resetStrip = () => {
@@ -136,83 +146,91 @@ export default function App() {
 
   return (
     <div className={`app ${stripBackground}`}>
-      <div className="new-badge">NEW LOOK · V4</div>
-      <h1>🫧 Kawaii Ocean Booth 🫧</h1>
+      <div className="bg-decor decor-left">✨🧸🌈</div>
+      <div className="bg-decor decor-right">🍓💫🎀</div>
 
-      <div className="layout">
-        <aside className="panel">
-          <h3>Camera</h3>
+      <header className="title-wrap">
+        <p className="pill">Kawaii Photo Club</p>
+        <h1>🎀 Cute Photo Booth 🎀</h1>
+        <p className="subtitle">Capture soft, sweet memories with dreamy themes and playful vibes.</p>
+      </header>
+
+      <div className="selector-grid">
+        <div className="selector card">
+          <h3>📷 Camera</h3>
           <select value={selectedCamera} onChange={(e) => setSelectedCamera(e.target.value)}>
             {cameras.map((cam, i) => (
-              <option key={cam.deviceId || i} value={cam.deviceId}>{cam.label || `Camera ${i + 1}`}</option>
+              <option key={cam.deviceId || i} value={cam.deviceId}>
+                {cam.label || `Camera ${i + 1}`}
+              </option>
             ))}
           </select>
+        </div>
 
-          <h3>Frames</h3>
-          <div className="chip-row">
-            {[2, 3, 4].map((n) => (
-              <button key={n} className={frameCount === n ? "chip active" : "chip"} onClick={() => { setFrameCount(n); resetStrip(); }}>
-                {n}
-              </button>
-            ))}
-          </div>
+        <div className="selector card">
+          <h3>🧁 Layout</h3>
+          {[2, 3, 4, 5, 6].map((n) => (
+            <button key={n} onClick={() => { setFrameCount(n); resetStrip(); }}>
+              {n} Frames
+            </button>
+          ))}
+        </div>
 
-          <h3>Theme</h3>
-          <div className="chip-row">
-            {backgroundThemes.map((theme) => (
-              <button key={theme.key} className={stripBackground === theme.key ? "chip active" : "chip"} onClick={() => setStripBackground(theme.key)}>
-                {theme.label}
-              </button>
-            ))}
-          </div>
+        <div className="selector card">
+          <h3>🎨 Theme</h3>
+          {backgroundThemes.map((theme) => (
+            <button key={theme.key} onClick={() => setStripBackground(theme.key)}>
+              {theme.label}
+            </button>
+          ))}
+        </div>
 
-          <h3>Filter</h3>
-          <div className="chip-row">
-            {filters.map((style) => (
-              <button key={style.value} className={filter === style.value ? "chip active" : "chip"} onClick={() => setFilter(style.value)}>
-                {style.label}
-              </button>
-            ))}
-          </div>
+        <div className="selector card">
+          <h3>🪄 Filter</h3>
+          {filters.map((style) => (
+            <button key={style.value} onClick={() => setFilter(style.value)}>
+              {style.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
-          <div className="progress-track"><div className="progress-fill" style={{ width: `${progressPercent}%`, background: activeTheme?.accent }} /></div>
-          <p className="progress-text">{currentFrame}/{frameCount} captured</p>
-        </aside>
+      <div className="camera-wrapper">
+        <video ref={videoRef} autoPlay muted style={{ filter }} />
+      </div>
 
-        <main className="booth-card">
-          <div className="frame-shell">
-            <div className="window main-window">
-              <video ref={videoRef} autoPlay muted style={{ filter }} />
-              {countdown !== null && countdown > 0 && <div className="countdown">{countdown}</div>}
-            </div>
-            <div className="divider" />
-            <div className="strip-grid">
-              {Array.from({ length: frameCount }).map((_, i) => (
-                <div key={i} className="window thumb-window">
-                  {photos[i] ? <img src={photos[i].photo} alt={`snap ${i + 1}`} style={{ filter }} /> : <span>SNAP {i + 1}</span>}
-                </div>
-              ))}
-            </div>
-            <div className="bubble b1">🫧</div><div className="bubble b2">🐟</div><div className="bubble b3">⭐</div>
-          </div>
+      {countdown !== null && countdown > 0 && <h2 className="countdown">📸 {countdown}...</h2>}
 
-          <div className="controls">
-            <button className="capture-btn" onClick={startCaptureSequence}>📸 Start</button>
-            <button className="capture-btn secondary" onClick={resetStrip}>Reset</button>
-          </div>
-        </main>
+      <div className="controls">
+        <button className="capture-btn" onClick={startCaptureSequence}>📸 Start Cute Session</button>
+        <button className="capture-btn secondary" onClick={resetStrip}>🔄 Reset Strip</button>
+      </div>
+
+      <div className={`strip ${stripBackground}`}>
+        {photos.map((p, i) => (
+          <img key={i} src={p.photo} alt="photo" style={{ filter }} />
+        ))}
       </div>
 
       {stripUrl && (
-        <section className="final-strip">
-          <h2>Finished strip 💖</h2>
+        <div className={`final-strip ${stripBackground}`}>
+          <h2>Your kawaii strip is ready! 💖</h2>
           <img src={stripUrl} alt="Collage Strip" className="strip-preview" />
           <div className="download-actions">
-            <a href={stripUrl} download="strip.png" className="download-btn">⬇️ Download</a>
-            {stripQrUrl && <img src={stripQrUrl} alt="QR Code" className="qr-code" />}
-          </div>
-        </section>
+            <a href={stripUrl} download="strip.png" className="download-btn">
+              ⬇️ Download Your Strip
+            </a>
+            {stripQrUrl && (
+              <div className="qr-section">
+                <h4>Scan to Download</h4>
+                <img src={stripQrUrl} alt="QR Code" className="qr-code" />
+              </div>
+            )}
+          </div></div>
+        
       )}
+
+      <h3 className="frame-progress">Frames Taken: {currentFrame}/{frameCount}</h3>
     </div>
   );
 }
