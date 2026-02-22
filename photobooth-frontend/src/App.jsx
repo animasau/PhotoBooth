@@ -112,7 +112,7 @@ export default function App() {
         setCurrentFrame(frameIndex + 1);
         if (frameIndex + 1 < frameCount) setTimeout(() => runSequence(frameIndex + 1), 1000);
       }
-    }
+    }, 1000);  
   };
 
   const takePhoto = async () => {
