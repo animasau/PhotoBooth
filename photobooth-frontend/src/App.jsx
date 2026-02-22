@@ -90,13 +90,16 @@ export default function App() {
 
   useEffect(() => {
     if (currentFrame === frameCount && photos.length === frameCount) {
-      finalizeStrip();
+      const timer = setTimeout(() => finalizeStrip(), 0);
+      return () => clearTimeout(timer);
     }
   }, [currentFrame, photos, frameCount, finalizeStrip]);
 
   const startCaptureSequence = () => {
     setPhotos([]);
     setCurrentFrame(0);
+    setStripUrl("");
+    setStripQrUrl("");
     runSequence(0);
   };
 
@@ -107,7 +110,7 @@ export default function App() {
     setCountdown(count);
 
     const countdownInterval = setInterval(() => {
-      count--;
+      count -= 1;
       setCountdown(count);
 
       if (count === 0) {
@@ -146,6 +149,9 @@ export default function App() {
     setStripUrl("");
     setStripQrUrl("");
   };
+
+  const progressPercent = Math.round((currentFrame / frameCount) * 100);
+  const activeTheme = backgroundThemes.find((theme) => theme.key === stripBackground);
 
   return (
     <div className={`app ${stripBackground}`}>
@@ -230,7 +236,7 @@ export default function App() {
               </div>
             )}
           </div>
-        </div>
+        </section>
       )}
 
       <h3 className="frame-progress">Frames Taken: {currentFrame}/{frameCount}</h3>

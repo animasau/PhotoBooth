@@ -73,6 +73,13 @@
   max-width: 980px;
   margin: 0 auto;
 }
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #f7b6d5;
+}
+.dot.active { background: #ff4f9e; transform: scale(1.18); }
 
 .card {
   background: rgba(255, 255, 255, 0.72);
@@ -145,6 +152,8 @@
 .capture-btn.secondary {
   background: linear-gradient(135deg, #a580ff, #7f66ea);
 }
+.capture-btn.secondary { background: linear-gradient(135deg, #a580ff, #7f66ea); }
+.frame-progress { margin: 10px 0 12px; color: #8f5b8f; }
 
 .strip {
   display: flex;
@@ -193,7 +202,6 @@
   justify-content: center;
   flex-wrap: wrap;
 }
-
 .download-btn {
   display: inline-block;
   padding: 10px 16px;
@@ -203,12 +211,7 @@
   border-radius: 10px;
   font-weight: bold;
 }
-
-.qr-section h4 {
-  margin-bottom: 6px;
-  color: #ff69b4;
-}
-
+.qr-section h4 { margin-bottom: 6px; color: #ff69b4; }
 .qr-code {
   width: 80px;
   height: 80px;
