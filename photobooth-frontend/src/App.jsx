@@ -1,22 +1,37 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import "./App.css";
+
+const backgroundThemes = [
+  { key: "yellow", label: "💛 Honey Cream" },
+  { key: "pinkgreen", label: "🌸 Mint Blossom" },
+  { key: "purple", label: "💜 Lavender Dream" },
+  { key: "black", label: "🖤 Monochrome Chic" },
+  { key: "blue", label: "💙 Blueberry Soda" }
+];
+
+const filters = [
+  { value: "none", label: "✨ Natural" },
+  { value: "grayscale(100%)", label: "🖤 Vintage Mono" },
+  { value: "sepia(100%)", label: "📜 Warm Sepia" },
+  { value: "brightness(120%)", label: "☀️ Glow Up" },
+  { value: "contrast(150%)", label: "⚡ Pop Contrast" }
+];
 
 export default function App() {
   const videoRef = useRef();
   const [photos, setPhotos] = useState([]);
   const [frameCount, setFrameCount] = useState(2);
-  const [stripBackground, setStripBackground] = useState("pink");
+  const [stripBackground, setStripBackground] = useState("pinkgreen");
   const [filter, setFilter] = useState("none");
   const [currentFrame, setCurrentFrame] = useState(0);
   const [countdown, setCountdown] = useState(null);
   const [cameras, setCameras] = useState([]);
   const [selectedCamera, setSelectedCamera] = useState("");
-  const [stripUrl, setStripUrl] = useState("");   // ✅ backend strip URL
-  const [stripQrUrl, setStripQrUrl] = useState(""); // ✅ backend QR URL
+  const [stripUrl, setStripUrl] = useState("");
+  const [stripQrUrl, setStripQrUrl] = useState("");
 
   const shutter = new Audio("https://www.soundjay.com/mechanical/camera-shutter-click-01.mp3");
 
-  // Enumerate devices
   useEffect(() => {
     navigator.mediaDevices.enumerateDevices().then((devices) => {
       const videoDevices = devices.filter((d) => d.kind === "videoinput");
@@ -27,13 +42,13 @@ export default function App() {
     });
   }, []);
 
-  // Start camera when selectedCamera changes
   useEffect(() => {
     const constraints = selectedCamera
       ? { video: { deviceId: { exact: selectedCamera } } }
       : { video: true };
 
-    navigator.mediaDevices.getUserMedia(constraints)
+    navigator.mediaDevices
+      .getUserMedia(constraints)
       .then((stream) => {
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
@@ -44,14 +59,41 @@ export default function App() {
       });
   }, [selectedCamera]);
 
-  // ✅ Trigger finalizeStrip only after all frames are captured
+  const finalizeStrip = useCallback(async () => {
+    if (photos.length === 0) return;
+
+    const formData = new FormData();
+    photos.forEach((p, i) => {
+      const byteString = atob(p.photo.split(",")[1]);
+      const mimeString = p.photo.split(",")[0].split(":")[1].split(";")[0];
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let j = 0; j < byteString.length; j++) {
+        ia[j] = byteString.charCodeAt(j);
+      }
+      const blob = new Blob([ab], { type: mimeString });
+      formData.append("files", blob, `photo${i}.png`);
+    });
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/finalize_strip/", {
+        method: "POST",
+        body: formData
+      });
+      const data = await response.json();
+      setStripUrl(data.strip_url);
+      setStripQrUrl(data.strip_qr_url);
+    } catch (err) {
+      console.error("Error finalizing strip:", err);
+    }
+  }, [photos]);
+
   useEffect(() => {
     if (currentFrame === frameCount && photos.length === frameCount) {
       finalizeStrip();
     }
-  }, [currentFrame, photos]);
+  }, [currentFrame, photos, frameCount, finalizeStrip]);
 
-  // Start full capture sequence
   const startCaptureSequence = () => {
     setPhotos([]);
     setCurrentFrame(0);
@@ -97,36 +139,6 @@ export default function App() {
     setPhotos((prev) => [...prev, { photo: imgData }]);
   };
 
-  // Send captured photos to backend
-  const finalizeStrip = async () => {
-    if (photos.length === 0) return;
-
-    const formData = new FormData();
-    photos.forEach((p, i) => {
-      const byteString = atob(p.photo.split(",")[1]);
-      const mimeString = p.photo.split(",")[0].split(":")[1].split(";")[0];
-      const ab = new ArrayBuffer(byteString.length);
-      const ia = new Uint8Array(ab);
-      for (let j = 0; j < byteString.length; j++) {
-        ia[j] = byteString.charCodeAt(j);
-      }
-      const blob = new Blob([ab], { type: mimeString });
-      formData.append("files", blob, `photo${i}.png`);
-    });
-
-    try {
-      const response = await fetch("http://127.0.0.1:8000/finalize_strip/", {
-        method: "POST",
-        body: formData
-      });
-      const data = await response.json();
-      setStripUrl(data.strip_url);
-      setStripQrUrl(data.strip_qr_url);
-    } catch (err) {
-      console.error("Error finalizing strip:", err);
-    }
-  };
-
   const resetStrip = () => {
     setPhotos([]);
     setCurrentFrame(0);
@@ -137,80 +149,75 @@ export default function App() {
 
   return (
     <div className={`app ${stripBackground}`}>
-      <h1>🎀 Photo Studio 🎀</h1>
+      <div className="bg-decor decor-left">✨🧸🌈</div>
+      <div className="bg-decor decor-right">🍓💫🎀</div>
 
-      {/* Camera Selector */}
-      <div className="selector">
-        <h3>Select Camera</h3>
-        <select value={selectedCamera} onChange={(e) => setSelectedCamera(e.target.value)}>
-          {cameras.map((cam, i) => (
-            <option key={i} value={cam.deviceId}>
-              {cam.label || `Camera ${i + 1}`}
-            </option>
+      <header className="title-wrap">
+        <p className="pill">Kawaii Photo Club</p>
+        <h1>🎀 Cute Photo Booth 🎀</h1>
+        <p className="subtitle">Capture soft, sweet memories with dreamy themes and playful vibes.</p>
+      </header>
+
+      <div className="selector-grid">
+        <div className="selector card">
+          <h3>📷 Camera</h3>
+          <select value={selectedCamera} onChange={(e) => setSelectedCamera(e.target.value)}>
+            {cameras.map((cam, i) => (
+              <option key={cam.deviceId || i} value={cam.deviceId}>
+                {cam.label || `Camera ${i + 1}`}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="selector card">
+          <h3>🧁 Layout</h3>
+          {[2, 3, 4, 5, 6].map((n) => (
+            <button key={n} onClick={() => { setFrameCount(n); resetStrip(); }}>
+              {n} Frames
+            </button>
           ))}
-        </select>
+        </div>
+
+        <div className="selector card">
+          <h3>🎨 Theme</h3>
+          {backgroundThemes.map((theme) => (
+            <button key={theme.key} onClick={() => setStripBackground(theme.key)}>
+              {theme.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="selector card">
+          <h3>🪄 Filter</h3>
+          {filters.map((style) => (
+            <button key={style.value} onClick={() => setFilter(style.value)}>
+              {style.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Frame Count Selector */}
-      <div className="selector">
-        <h3>Choose layout</h3>
-        {[2, 3, 4, 5, 6].map((n) => (
-          <button key={n} onClick={() => { setFrameCount(n); resetStrip(); }}>
-            {n} Frames
-          </button>
-        ))}
-      </div>
-
-      {/* Background Selector */}
-      <div className="selector">
-        <h3>Choose Background</h3>
-        <button onClick={() => setStripBackground("yellow")}>💛 Yellow</button>
-        <button onClick={() => setStripBackground("pinkgreen")}>🌸💚 Pink Green</button>
-        <button onClick={() => setStripBackground("purple")}>💜 Purple</button>
-        <button onClick={() => setStripBackground("black")}>🖤 Black</button>
-        <button onClick={() => setStripBackground("blue")}>💙 Blue</button>
-      </div>
-
-      {/* Filter Selector */}
-      <div className="selector">
-        <h3>Choose Filter</h3>
-        <button onClick={() => setFilter("none")}>✨ None</button>
-        <button onClick={() => setFilter("grayscale(100%)")}>🖤 Grayscale</button>
-        <button onClick={() => setFilter("sepia(100%)")}>📜 Sepia</button>
-        <button onClick={() => setFilter("brightness(120%)")}>☀️ Bright</button>
-        <button onClick={() => setFilter("contrast(150%)")}>⚡ Contrast</button>
-      </div>
-
-      {/* Camera Preview */}
       <div className="camera-wrapper">
-        <video ref={videoRef} autoPlay muted style={{ filter: filter }} />
+        <video ref={videoRef} autoPlay muted style={{ filter }} />
       </div>
 
-      {/* Countdown */}
-      {countdown !== null && countdown > 0 && (
-        <h2 style={{ color: "#ff69b4" }}>📸 {countdown}...</h2>
-      )}
+      {countdown !== null && countdown > 0 && <h2 className="countdown">📸 {countdown}...</h2>}
 
       <div className="controls">
-        <button className="capture-btn" onClick={startCaptureSequence}>
-          📸 Start Capture Sequence
-        </button>
-        <button className="capture-btn" onClick={resetStrip}>
-          🔄 Reset Strip
-        </button>
+        <button className="capture-btn" onClick={startCaptureSequence}>📸 Start Cute Session</button>
+        <button className="capture-btn secondary" onClick={resetStrip}>🔄 Reset Strip</button>
       </div>
 
-      {/* Captured Photos (keep same strip background during capture) */}
       <div className={`strip ${stripBackground}`}>
         {photos.map((p, i) => (
-          <img key={i} src={p.photo} alt="photo" style={{ filter: filter }} />
+          <img key={i} src={p.photo} alt="photo" style={{ filter }} />
         ))}
       </div>
 
-      {/* ✅ Final booth strip shown separately */}
       {stripUrl && (
         <div className={`final-strip ${stripBackground}`}>
-          <h2>Your photo Booth </h2>
+          <h2>Your kawaii strip is ready! 💖</h2>
           <img src={stripUrl} alt="Collage Strip" className="strip-preview" />
           <div className="download-actions">
             <a href={stripUrl} download="strip.png" className="download-btn">
@@ -226,9 +233,7 @@ export default function App() {
         </div>
       )}
 
-      <h3>
-        Frames Taken: {currentFrame}/{frameCount}
-      </h3>
+      <h3 className="frame-progress">Frames Taken: {currentFrame}/{frameCount}</h3>
     </div>
   );
 }
