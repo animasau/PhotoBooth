@@ -235,8 +235,8 @@ export default function App() {
                 <img src={stripQrUrl} alt="QR Code" className="qr-code" />
               </div>
             )}
-          </div>
-        </section>
+          </div></div>
+        
       )}
 
       <h3 className="frame-progress">Frames Taken: {currentFrame}/{frameCount}</h3>
