@@ -177,6 +177,7 @@
   margin-bottom: 8px;
   border-radius: 10px;
 }
+.capture-btn.secondary { background: linear-gradient(135deg, #8dbccf, #648ea0); }
 
 .final-strip {
   margin-top: 28px;
@@ -192,10 +193,12 @@
   max-width: 240px;
   border: 4px solid #ffb6d9;
   border-radius: 10px;
+  background: #f7f4e6;
 }
 
 .download-actions {
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 20px;
   margin-top: 12px;

@@ -43,9 +43,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const constraints = selectedCamera
-      ? { video: { deviceId: { exact: selectedCamera } } }
-      : { video: true };
+    const constraints = selectedCamera ? { video: { deviceId: { exact: selectedCamera } } } : { video: true };
 
     navigator.mediaDevices
       .getUserMedia(constraints)
