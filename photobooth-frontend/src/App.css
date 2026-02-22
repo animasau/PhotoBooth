@@ -1,165 +1,254 @@
-/* General App Styling */
 .app {
   text-align: center;
-  font-family: "Comic Sans MS", cursive, sans-serif;
-  padding: 20px;
-}
-
-/* Title */
-.app h1 {
-  font-size: 2.5rem;
-  color: #ff69b4;
-  text-shadow: 2px 2px #fff;
-  margin-bottom: 20px;
-}
-
-/* Selector Panels */
-.selector {
-  margin: 15px 0;
-}
-.selector h3 {
-  margin-bottom: 10px;
-  color: #ff69b4;
-}
-.selector button {
-  margin: 5px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: none;
-  background: #ffe4f0;
-  cursor: pointer;
-  transition: 0.3s;
-  z-index: 10;
+  font-family: "Nunito", "Comic Sans MS", cursive, sans-serif;
+  padding: 24px;
+  min-height: 100vh;
+  color: #5e4066;
   position: relative;
 }
-.selector button:hover {
-  background: #ffb6c1;
+
+.app.yellow { background: linear-gradient(180deg, #fffdf2, #fff4d1); }
+.app.pinkgreen { background: linear-gradient(160deg, #ffeaf5, #e8ffe9); }
+.app.purple { background: linear-gradient(170deg, #f6ecff, #ead8ff); }
+.app.black { background: linear-gradient(160deg, #f3f3f3, #dcdcdc); }
+.app.blue { background: linear-gradient(160deg, #eaf4ff, #d8e8ff); }
+
+.card {
+  background: rgba(255, 255, 255, 0.82);
+  border: 2px solid #ffd0e6;
+  border-radius: 20px;
+  box-shadow: 0 10px 26px rgba(198, 95, 152, 0.12);
 }
 
-/* Camera Wrapper */
-.camera-wrapper {
-  position: relative;
+.title-wrap { margin: 0 auto 18px; max-width: 760px; }
+.pill {
   display: inline-block;
-  margin: 20px 0;
+  margin: 0;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #ffd7ea;
+  color: #b53f79;
+  font-weight: 700;
 }
-.camera-wrapper video {
-  border: 6px solid #ff69b4;
-  border-radius: 12px;
-  width: 400px;
-  height: auto;
+.app h1 { font-size: 2.7rem; margin: 12px 0 8px; color: #d1458f; }
+.subtitle { margin: 0; color: #7b5d85; }
+
+.sticker-cloud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.sticker {
+  position: absolute;
+  font-size: 1.5rem;
+  animation: bob 4s ease-in-out infinite;
+  opacity: 0.82;
+}
+.sticker-1 { left: 5%; top: 16%; }
+.sticker-2 { right: 8%; top: 20%; animation-delay: 0.5s; }
+.sticker-3 { left: 8%; top: 54%; animation-delay: 1s; }
+.sticker-4 { right: 7%; top: 58%; animation-delay: 1.5s; }
+.sticker-5 { left: 20%; top: 78%; animation-delay: 2s; }
+.sticker-6 { right: 22%; top: 82%; animation-delay: 2.5s; }
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(-4deg); }
 }
 
-/* Capture Button */
+.status-bar {
+  max-width: 980px;
+  margin: 0 auto 16px;
+  padding: 14px 16px;
+}
+.status-bar p { margin: 0 0 8px; font-weight: 700; color: #b14983; }
+.progress-track {
+  height: 10px;
+  border-radius: 999px;
+  background: #ffe9f5;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+.frame-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #f7b6d5;
+}
+.dot.active { background: #ff4f9e; transform: scale(1.18); }
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(290px, 360px) 1fr;
+  gap: 16px;
+  max-width: 1080px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+.controls-pane {
+  padding: 16px;
+  text-align: left;
+  position: sticky;
+  top: 14px;
+}
+.selector-block h3 { margin: 0 0 8px; color: #d1458f; }
+.selector-block + .selector-block { margin-top: 14px; }
+
+select {
+  width: 100%;
+  border: 1px solid #ffb3d7;
+  border-radius: 12px;
+  background: #fff7fc;
+  color: #7b355f;
+  font-weight: 600;
+  padding: 10px;
+}
+
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid #ffb3d7;
+  background: #fff7fc;
+  color: #7b355f;
+  font-weight: 600;
+  cursor: pointer;
+}
+.chip.active {
+  background: linear-gradient(135deg, #ff8ac7, #ff5fa9);
+  color: #fff;
+  border-color: transparent;
+}
+
+.preview-pane {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 22px;
+  padding: 14px;
+}
+
+.camera-wrapper {
+  margin: 0 auto 12px;
+  max-width: 560px;
+  border: 8px solid #ff89c3;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(224, 113, 170, 0.28);
+  position: relative;
+}
+.camera-wrapper video { display: block; width: 100%; height: auto; }
+.countdown-bubble {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 4rem;
+  font-weight: 800;
+  color: white;
+  text-shadow: 0 0 16px rgba(255, 79, 158, 0.9);
+  background: rgba(255, 110, 176, 0.22);
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
 .capture-btn {
-  margin: 20px;
-  padding: 12px 20px;
-  font-size: 1.2rem;
-  background: #ff69b4;
+  margin: 8px 0;
+  padding: 12px 18px;
+  font-size: 1rem;
+  background: linear-gradient(135deg, #ff7fbe, #ff4f9e);
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 14px;
   cursor: pointer;
-  transition: 0.3s;
-  z-index: 20;
-  position: relative;
+  font-weight: 700;
 }
-.capture-btn:hover {
-  background: #ff1493;
-}
+.capture-btn.secondary { background: linear-gradient(135deg, #a580ff, #7f66ea); }
+.frame-progress { margin: 10px 0 12px; color: #8f5b8f; }
 
-/* Collage Strip (during capture) */
-.strip {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 25px;
-  padding: 15px;
+.polaroid-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+}
+.polaroid {
+  margin: 0;
+  background: #fff;
   border-radius: 12px;
-  position: relative;
-  z-index: 1;
+  padding: 8px 8px 10px;
+  box-shadow: 0 8px 18px rgba(142, 107, 142, 0.2);
+  transform: rotate(-1deg);
 }
-
-/* Pastel Strip Background Variants */
-.strip.yellow {
-  background-color: #fff9c4;
-  border: 4px dashed #fbc02d;
-}
-.strip.pinkgreen {
-  background: linear-gradient(135deg, #f8bbd0 50%, #c8e6c9 50%);
-  border: 4px dashed #f48fb1;
-}
-.strip.purple {
-  background-color: #e1bee7;
-  border: 4px dashed #9c27b0;
-}
-.strip.black {
-  background-color: #eeeeee;
-  border: 4px dashed #424242;
-}
-.strip.blue {
-  background-color: #bbdefb;
-  border: 4px dashed #2196f3;
-}
-
-/* Photos inside strip */
-.strip img {
+.polaroid:nth-child(even) { transform: rotate(1deg); }
+.polaroid img {
   display: block;
   width: 100%;
-  margin-bottom: 10px;
-  border-radius: 12px;
+  border-radius: 8px;
+}
+.polaroid figcaption {
+  margin-top: 6px;
+  font-size: 0.88rem;
+  color: #855674;
 }
 
-/* ✅ Final Booth Strip (separate) */
 .final-strip {
-  margin-top: 30px;
-  padding: 20px;
-  border-radius: 12px;
-  text-align: center;
+  margin: 20px auto 0;
+  padding: 18px;
+  border-radius: 18px;
+  max-width: 540px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 2px dashed #ff9ecb;
 }
-.final-strip h2 {
-  color: #ff69b4;
-  margin-bottom: 15px;
-}
+.final-strip h2 { color: #d1458f; margin: 0 0 12px; }
 .final-strip img.strip-preview {
-  max-width: 250px;
-  border: 4px solid #ffb6c1;
+  max-width: 240px;
+  border: 4px solid #ffb6d9;
   border-radius: 10px;
 }
 
-/* Download + QR side by side */
 .download-actions {
   display: flex;
   align-items: center;
   gap: 20px;
-  margin-top: 10px;
+  margin-top: 12px;
   justify-content: center;
+  flex-wrap: wrap;
 }
-
 .download-btn {
   display: inline-block;
   padding: 10px 16px;
-  background-color: #ff69b4; /* pastel pink */
+  background: #ff69b4;
   color: white;
   text-decoration: none;
-  border-radius: 6px;
+  border-radius: 10px;
   font-weight: bold;
-  transition: 0.3s;
 }
-.download-btn:hover {
-  background-color: #ff85c1;
-}
-
-.qr-section h4 {
-  margin-bottom: 6px;
-  color: #ff69b4;
-}
-
+.qr-section h4 { margin-bottom: 6px; color: #ff69b4; }
 .qr-code {
-  width: 80px;   /* smaller QR */
+  width: 80px;
   height: 80px;
   object-fit: contain;
-  border: 3px solid #ff69b4; /* ✅ pink line around QR */
-  border-radius: 8px;        /* optional rounded edges */
-  padding: 4px;              /* spacing inside border */
-  background: #fff;          /* keeps QR clear on pastel */
+  border: 3px solid #ff69b4;
+  border-radius: 8px;
+  padding: 4px;
+  background: #fff;
+}
+
+@media (max-width: 920px) {
+  .dashboard-grid { grid-template-columns: 1fr; }
+  .controls-pane { position: static; text-align: center; }
+  .sticker { opacity: 0.45; }
 }
