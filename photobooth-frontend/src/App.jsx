@@ -52,9 +52,7 @@ export default function App() {
           videoRef.current.srcObject = stream;
         }
       })
-      .catch((err) => {
-        console.error("Camera error:", err);
-      });
+      .catch((err) => console.error("Camera error:", err));
   }, [selectedCamera]);
 
   const finalizeStrip = useCallback(async () => {
@@ -103,22 +101,17 @@ export default function App() {
 
   const runSequence = (frameIndex) => {
     if (frameIndex >= frameCount) return;
-
     let count = 3;
     setCountdown(count);
 
     const countdownInterval = setInterval(() => {
       count -= 1;
       setCountdown(count);
-
       if (count === 0) {
         clearInterval(countdownInterval);
         takePhoto();
         setCurrentFrame(frameIndex + 1);
-
-        if (frameIndex + 1 < frameCount) {
-          setTimeout(() => runSequence(frameIndex + 1), 1000);
-        }
+        if (frameIndex + 1 < frameCount) setTimeout(() => runSequence(frameIndex + 1), 1000);
       }
     }, 1000);
   };

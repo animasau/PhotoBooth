@@ -164,6 +164,7 @@
   border-radius: 14px;
   max-width: 320px;
 }
+.chip.active { background: linear-gradient(135deg, #63c2ec, #2d98cd); color: white; border-color: transparent; }
 
 .strip.yellow { background-color: #fff9c4; border: 4px dashed #fbc02d; }
 .strip.pinkgreen { background: linear-gradient(135deg, #f8bbd0 50%, #c8e6c9 50%); border: 4px dashed #f48fb1; }
