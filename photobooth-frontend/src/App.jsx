@@ -2,28 +2,26 @@ import React, { useRef, useEffect, useState, useCallback } from "react";
 import "./App.css";
 
 const backgroundThemes = [
-  { key: "yellow", label: "💛 Butter", accent: "#f7c948" },
-  { key: "pinkgreen", label: "🌸 Mint", accent: "#f48fb1" },
-  { key: "purple", label: "💜 Grape", accent: "#9c27b0" },
-  { key: "black", label: "🖤 Mono", accent: "#424242" },
-  { key: "blue", label: "💙 Ocean", accent: "#4ea9d3" }
+  { key: "yellow", label: "💛 Honey Cream" },
+  { key: "pinkgreen", label: "🌸 Mint Blossom" },
+  { key: "purple", label: "💜 Lavender Dream" },
+  { key: "black", label: "🖤 Monochrome Chic" },
+  { key: "blue", label: "💙 Blueberry Soda" }
 ];
 
 const filters = [
   { value: "none", label: "✨ Natural" },
-  { value: "grayscale(100%)", label: "🖤 Mono" },
-  { value: "sepia(100%)", label: "📜 Sepia" },
-  { value: "brightness(120%)", label: "☀️ Bright" },
-  { value: "contrast(150%)", label: "⚡ Contrast" }
+  { value: "grayscale(100%)", label: "🖤 Vintage Mono" },
+  { value: "sepia(100%)", label: "📜 Warm Sepia" },
+  { value: "brightness(120%)", label: "☀️ Glow Up" },
+  { value: "contrast(150%)", label: "⚡ Pop Contrast" }
 ];
-
-const seaStickers = ["🫧", "🐟", "🦑", "🪼", "🐚", "⭐"];
 
 export default function App() {
   const videoRef = useRef();
   const [photos, setPhotos] = useState([]);
   const [frameCount, setFrameCount] = useState(2);
-  const [stripBackground, setStripBackground] = useState("blue");
+  const [stripBackground, setStripBackground] = useState("pinkgreen");
   const [filter, setFilter] = useState("none");
   const [currentFrame, setCurrentFrame] = useState(0);
   const [countdown, setCountdown] = useState(null);
@@ -95,21 +93,12 @@ export default function App() {
     }
   }, [currentFrame, photos, frameCount, finalizeStrip]);
 
-  const takePhoto = () => {
-    if (!videoRef.current) return;
-
-    const canvas = document.createElement("canvas");
-    canvas.width = videoRef.current.videoWidth;
-    canvas.height = videoRef.current.videoHeight;
-    const ctx = canvas.getContext("2d");
-
-    if (filter !== "none") ctx.filter = filter;
-
-    ctx.drawImage(videoRef.current, 0, 0);
-    const imgData = canvas.toDataURL("image/png");
-
-    shutter.play();
-    setPhotos((prev) => [...prev, { photo: imgData }]);
+  const startCaptureSequence = () => {
+    setPhotos([]);
+    setCurrentFrame(0);
+    setStripUrl("");
+    setStripQrUrl("");
+    runSequence(0);
   };
 
   const runSequence = (frameIndex) => {
@@ -134,12 +123,21 @@ export default function App() {
     }, 1000);
   };
 
-  const startCaptureSequence = () => {
-    setPhotos([]);
-    setCurrentFrame(0);
-    setStripUrl("");
-    setStripQrUrl("");
-    runSequence(0);
+  const takePhoto = () => {
+    if (!videoRef.current) return;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+    const ctx = canvas.getContext("2d");
+
+    if (filter !== "none") ctx.filter = filter;
+
+    ctx.drawImage(videoRef.current, 0, 0);
+    const imgData = canvas.toDataURL("image/png");
+
+    shutter.play();
+    setPhotos((prev) => [...prev, { photo: imgData }]);
   };
 
   const resetStrip = () => {
@@ -155,14 +153,17 @@ export default function App() {
 
   return (
     <div className={`app ${stripBackground}`}>
+      <div className="bg-decor decor-left">✨🧸🌈</div>
+      <div className="bg-decor decor-right">🍓💫🎀</div>
+
       <header className="title-wrap">
-        <p className="pill">Underwater Kawaii Booth</p>
-        <h1>🫧 Ocean Frame Studio 🫧</h1>
-        <p className="subtitle">Inspired by your reference: soft aqua frame, bubbles, tiny fish and cute sticker vibes.</p>
+        <p className="pill">Kawaii Photo Club</p>
+        <h1>🎀 Cute Photo Booth 🎀</h1>
+        <p className="subtitle">Capture soft, sweet memories with dreamy themes and playful vibes.</p>
       </header>
 
-      <div className="dashboard-grid">
-        <aside className="controls-pane card">
+      <div className="selector-grid">
+        <div className="selector card">
           <h3>📷 Camera</h3>
           <select value={selectedCamera} onChange={(e) => setSelectedCamera(e.target.value)}>
             {cameras.map((cam, i) => (
@@ -171,95 +172,55 @@ export default function App() {
               </option>
             ))}
           </select>
+        </div>
 
+        <div className="selector card">
           <h3>🧁 Layout</h3>
-          <div className="chip-row">
-            {[2, 3, 4].map((n) => (
-              <button
-                key={n}
-                className={frameCount === n ? "chip active" : "chip"}
-                onClick={() => {
-                  setFrameCount(n);
-                  resetStrip();
-                }}
-              >
-                {n} Frames
-              </button>
-            ))}
-          </div>
+          {[2, 3, 4, 5, 6].map((n) => (
+            <button key={n} onClick={() => { setFrameCount(n); resetStrip(); }}>
+              {n} Frames
+            </button>
+          ))}
+        </div>
 
+        <div className="selector card">
           <h3>🎨 Theme</h3>
-          <div className="chip-row">
-            {backgroundThemes.map((theme) => (
-              <button
-                key={theme.key}
-                className={stripBackground === theme.key ? "chip active" : "chip"}
-                onClick={() => setStripBackground(theme.key)}
-              >
-                {theme.label}
-              </button>
-            ))}
-          </div>
+          {backgroundThemes.map((theme) => (
+            <button key={theme.key} onClick={() => setStripBackground(theme.key)}>
+              {theme.label}
+            </button>
+          ))}
+        </div>
 
+        <div className="selector card">
           <h3>🪄 Filter</h3>
-          <div className="chip-row">
-            {filters.map((style) => (
-              <button
-                key={style.value}
-                className={filter === style.value ? "chip active" : "chip"}
-                onClick={() => setFilter(style.value)}
-              >
-                {style.label}
-              </button>
-            ))}
-          </div>
+          {filters.map((style) => (
+            <button key={style.value} onClick={() => setFilter(style.value)}>
+              {style.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
-          <section className="status-bar">
-            <p>Session Progress</p>
-            <div className="progress-track" role="progressbar" aria-valuenow={progressPercent}>
-              <div className="progress-fill" style={{ width: `${progressPercent}%`, background: activeTheme?.accent }} />
-            </div>
-            <div className="frame-dots">
-              {Array.from({ length: frameCount }).map((_, index) => (
-                <span key={index} className={index < currentFrame ? "dot active" : "dot"} />
-              ))}
-            </div>
-          </section>
-        </aside>
+      <div className="camera-wrapper">
+        <video ref={videoRef} autoPlay muted style={{ filter }} />
+      </div>
 
-        <main className="preview-pane card">
-          <section className="inspo-frame">
-            <div className="sea-decoration" aria-hidden="true">
-              {seaStickers.map((s, i) => (
-                <span key={`${s}-${i}`} className={`sea-item sea-item-${i + 1}`}>{s}</span>
-              ))}
-            </div>
+      {countdown !== null && countdown > 0 && <h2 className="countdown">📸 {countdown}...</h2>}
 
-            <div className="camera-window">
-              <video ref={videoRef} autoPlay muted style={{ filter }} />
-              {countdown !== null && countdown > 0 && <div className="countdown-bubble">{countdown}</div>}
-            </div>
+      <div className="controls">
+        <button className="capture-btn" onClick={startCaptureSequence}>📸 Start Cute Session</button>
+        <button className="capture-btn secondary" onClick={resetStrip}>🔄 Reset Strip</button>
+      </div>
 
-            <div className="frame-divider" />
-
-            <div className="mini-strip">
-              {Array.from({ length: frameCount }).map((_, i) => (
-                <div key={i} className="mini-window">
-                  {photos[i] ? <img src={photos[i].photo} alt={`captured ${i + 1}`} style={{ filter }} /> : <p>Snap {i + 1}</p>}
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <div className="controls">
-            <button className="capture-btn" onClick={startCaptureSequence}>📸 Start Cute Session</button>
-            <button className="capture-btn secondary" onClick={resetStrip}>🔄 Reset Strip</button>
-          </div>
-        </main>
+      <div className={`strip ${stripBackground}`}>
+        {photos.map((p, i) => (
+          <img key={i} src={p.photo} alt="photo" style={{ filter }} />
+        ))}
       </div>
 
       {stripUrl && (
-        <section className="final-strip">
+        <div className={`final-strip ${stripBackground}`}>
           <h2>Your kawaii strip is ready! 💖</h2>
           <img src={stripUrl} alt="Collage Strip" className="strip-preview" />
           <div className="download-actions">
@@ -272,9 +233,11 @@ export default function App() {
                 <img src={stripQrUrl} alt="QR Code" className="qr-code" />
               </div>
             )}
-          </div>
-        </section>
+          </div></div>
+        
       )}
+
+      <h3 className="frame-progress">Frames Taken: {currentFrame}/{frameCount}</h3>
     </div>
   );
 }
