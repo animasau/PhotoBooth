@@ -110,6 +110,7 @@
 .selector select:hover {
   background: #ffe6f4;
 }
+.chip.active { background: linear-gradient(135deg, #63c2ec, #2d98cd); color: white; border-color: transparent; }
 
 .camera-wrapper {
   margin: 22px auto 12px;

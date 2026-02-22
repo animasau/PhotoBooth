@@ -19,6 +19,7 @@ const filters = [
 
 export default function App() {
   const videoRef = useRef();
+  const frameRef = useRef();
   const [photos, setPhotos] = useState([]);
   const [frameCount, setFrameCount] = useState(2);
   const [stripBackground, setStripBackground] = useState("pinkgreen");
@@ -48,9 +49,7 @@ export default function App() {
     navigator.mediaDevices
       .getUserMedia(constraints)
       .then((stream) => {
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
+        if (videoRef.current) videoRef.current.srcObject = stream;
       })
       .catch((err) => console.error("Camera error:", err));
   }, [selectedCamera]);
@@ -113,24 +112,22 @@ export default function App() {
         setCurrentFrame(frameIndex + 1);
         if (frameIndex + 1 < frameCount) setTimeout(() => runSequence(frameIndex + 1), 1000);
       }
-    }, 1000);
+    }
   };
 
-  const takePhoto = () => {
+  const takePhoto = async () => {
     if (!videoRef.current) return;
-
     const canvas = document.createElement("canvas");
     canvas.width = videoRef.current.videoWidth;
     canvas.height = videoRef.current.videoHeight;
     const ctx = canvas.getContext("2d");
 
     if (filter !== "none") ctx.filter = filter;
-
     ctx.drawImage(videoRef.current, 0, 0);
-    const imgData = canvas.toDataURL("image/png");
+    await drawStickersOnCanvas(ctx, canvas.width, canvas.height);
 
     shutter.play();
-    setPhotos((prev) => [...prev, { photo: imgData }]);
+    setPhotos((prev) => [...prev, { photo: canvas.toDataURL("image/png") }]);
   };
 
   const resetStrip = () => {
